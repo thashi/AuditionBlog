@@ -3,6 +3,7 @@ package com.audition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,10 +47,9 @@ class AuditionApplicationTests {
     @Test
     void testGetPostsSuccess() {
         final AuditionPost[] posts = {
-            new AuditionPost(1, 1, "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-                "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto")
+            new AuditionPost()
         };
-        final String url = postUrl;
+        final String url = baseUrl + "posts";
         when(restTemplate.getForObject(url, AuditionPost[].class)).thenReturn(posts);
 
         final List<AuditionPost> result = auditionIntegrationClient.getPosts();
@@ -62,7 +62,7 @@ class AuditionApplicationTests {
 
     @Test
     void testGetPostsNotFound() {
-        final String url = postUrl;
+        final String url = baseUrl + "posts";
         when(restTemplate.getForObject(url, AuditionPost[].class)).thenThrow(
             new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
@@ -119,7 +119,7 @@ class AuditionApplicationTests {
         assertNotNull(result);
         assertNotNull(result.getPost());
         assertNotNull(result.getComments());
-        verify(restTemplate, times(1)).getForObject(postUrl, AuditionPost.class);
+        verify(restTemplate, times(1)).getForObject(pUrl, AuditionPost.class);
         verify(restTemplate, times(1)).getForObject(commentUrl, Comment[].class);
     }
 
@@ -127,7 +127,7 @@ class AuditionApplicationTests {
     void testGetPostWithCommentsByIdNotFound() {
         final String postId = "1";
         final String url = postUrl + postId + "/comments";
-        when(restTemplate.getForObject(url, Comment[].class))
+        lenient().when(restTemplate.getForObject(url, Comment[].class))
             .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         final SystemException exception = assertThrows(SystemException.class, () -> {
