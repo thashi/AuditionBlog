@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuditionIntegrationClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">audition-api</a> &gt; <a href="index.source.html" class="el_package">com.audition.integration</a> &gt; <span class="el_source">AuditionIntegrationClient.java</span></div><h1>AuditionIntegrationClient.java</h1><pre class="source lang-java linenums">package com.audition.integration;
+
+import com.audition.common.exception.SystemException;
+import com.audition.common.logging.AuditionLogger;
+import com.audition.model.AuditionPost;
+import com.audition.model.AuditionPostComment;
+import com.audition.model.Comment;
+import java.util.Arrays;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+<span class="fc" id="L17">public class AuditionIntegrationClient {</span>
+
+
+    @Autowired
+    AuditionLogger logger;
+
+    @Autowired
+    private transient RestTemplate restTemplate;
+
+    //    @Value(&quot;${audition.base.url}&quot;)
+<span class="fc" id="L27">    private transient String baseUrl = &quot;https://jsonplaceholder.typicode.com/&quot;;</span>
+
+<span class="fc" id="L29">    private transient String unknownError = &quot;Unknown Error: &quot;;</span>
+
+    public List&lt;AuditionPost&gt; getPosts() {
+<span class="nc" id="L32">        final String url = baseUrl + &quot;posts&quot;;</span>
+
+        try {
+            // Make a GET request to fetch the posts
+<span class="nc" id="L36">            final AuditionPost[] postArray = restTemplate.getForObject(url, AuditionPost[].class);</span>
+
+<span class="nc" id="L38">            return Arrays.asList(postArray);</span>
+<span class="nc" id="L39">        } catch (final HttpClientErrorException e) {</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L41">                throw new SystemException(&quot;Cannot find any Posts&quot;, &quot;Resource Not Fount&quot;, 404, e);</span>
+            } else {
+<span class="nc" id="L43">                final String errorMessage = &quot;An error occured while fetching the posts &quot; + e.getMessage();</span>
+<span class="nc" id="L44">                throw new SystemException(unknownError + errorMessage, e);</span>
+            }
+        }
+    }
+
+    public AuditionPost getPostById(final String id) {
+<span class="nc" id="L50">        final String url = baseUrl + &quot;posts/&quot; + id;</span>
+        try {
+<span class="nc" id="L52">            return restTemplate.getForObject(url, AuditionPost.class);</span>
+<span class="nc" id="L53">        } catch (final HttpClientErrorException e) {</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L55">                throw new SystemException(&quot;Cannot find a Post with id &quot; + id, &quot;Resource Not Found&quot;,</span>
+<span class="nc" id="L56">                    404, e);</span>
+            } else {
+<span class="nc" id="L58">                final String errorMessage =</span>
+<span class="nc" id="L59">                    &quot;An error occured while fetching the post with id &quot; + id + &quot;: &quot; + e.getMessage();</span>
+<span class="nc" id="L60">                throw new SystemException(unknownError + errorMessage, e);</span>
+            }
+        }
+    }
+
+    public AuditionPostComment getPostWithCommentsById(final String postId) {
+<span class="nc" id="L66">        final String url = baseUrl + &quot;posts/&quot; + postId + &quot;/comments&quot;;</span>
+        try {
+<span class="nc" id="L68">            final AuditionPostComment postComment = new AuditionPostComment();</span>
+            // use getPostById method
+<span class="nc" id="L70">            final AuditionPost post = getPostById(postId);</span>
+
+<span class="nc" id="L72">            final Comment[] comments = restTemplate.getForObject(url, Comment[].class);</span>
+<span class="nc bnc" id="L73" title="All 4 branches missed.">            if (post != null &amp;&amp; comments != null) {</span>
+<span class="nc" id="L74">                postComment.setPost(post);</span>
+<span class="nc" id="L75">                postComment.setComments(Arrays.asList(comments));</span>
+            }
+
+<span class="nc" id="L78">            return postComment;</span>
+<span class="nc" id="L79">        } catch (final HttpClientErrorException e) {</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L81">                throw new SystemException(&quot;Cannot find a Post with id &quot; + postId, &quot;Resource Not Found&quot;, 404, e);</span>
+            } else {
+<span class="nc" id="L83">                final String errorMessage =</span>
+<span class="nc" id="L84">                    &quot;An error occurred while fetching the post with id &quot; + postId + &quot;: &quot; + e.getMessage();</span>
+<span class="nc" id="L85">                throw new SystemException(unknownError + errorMessage, e);</span>
+            }
+        }
+    }
+
+    public List&lt;Comment&gt; getComments(final String postId) {
+<span class="fc" id="L91">        final String url = baseUrl + &quot;comments?postId=&quot; + postId;</span>
+        try {
+<span class="nc" id="L93">            final Comment[] comments = restTemplate.getForObject(url, Comment[].class);</span>
+
+<span class="nc" id="L95">            return Arrays.asList(comments);</span>
+<span class="fc" id="L96">        } catch (final HttpClientErrorException e) {</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L98">                throw new SystemException(&quot;Cannot find any Comments&quot;, &quot;Resource Not Fount&quot;, 404, e);</span>
+            } else {
+<span class="nc" id="L100">                final String errorMessage = &quot;An error occured while fetching the comments &quot; + e.getMessage();</span>
+<span class="nc" id="L101">                throw new SystemException(unknownError + errorMessage, e);</span>
+            }
+        }
+    }
+    // The comments are a separate list that needs to be returned to the API consumers. Hint: this is not part of the AuditionPost pojo.
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
