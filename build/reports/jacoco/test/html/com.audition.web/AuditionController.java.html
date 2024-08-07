@@ -27,12 +27,12 @@ import org.springframework.web.server.ResponseStatusException;
     @RequestMapping(value = &quot;/posts&quot;, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody List&lt;AuditionPost&gt; getPosts(
         @RequestParam(value = &quot;userId&quot;, required = false) final Integer userId) {
-<span class="nc" id="L30">        List&lt;AuditionPost&gt; posts = auditionService.getPosts();</span>
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (userId != null) {</span>
+<span class="fc" id="L30">        List&lt;AuditionPost&gt; posts = auditionService.getPosts();</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        if (userId != null) {</span>
 <span class="nc bnc" id="L32" title="All 2 branches missed.">            posts = posts.stream().filter(p -&gt; p.getUserId() == userId)</span>
 <span class="nc" id="L33">                .collect(Collectors.toList());</span>
         }
-<span class="nc" id="L35">        return posts;</span>
+<span class="fc" id="L35">        return posts;</span>
     }
 
     @RequestMapping(value = &quot;/posts/{id}&quot;, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

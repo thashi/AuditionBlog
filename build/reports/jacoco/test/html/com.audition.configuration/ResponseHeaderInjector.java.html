@@ -13,15 +13,16 @@ import org.springframework.web.servlet.HandlerInterceptor;
     // TODO Inject openTelemetry trace and span Ids in the response headers.
 
     @Override
-    public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response, final Object handler,
+    public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response,
+        final Object handler,
         final Exception ex) {
-<span class="nc" id="L18">        final Span currentSpan = Span.current();</span>
-<span class="nc" id="L19">        final SpanContext spanContext = currentSpan.getSpanContext();</span>
+<span class="nc" id="L19">        final Span currentSpan = Span.current();</span>
+<span class="nc" id="L20">        final SpanContext spanContext = currentSpan.getSpanContext();</span>
 
-<span class="nc bnc" id="L21" title="All 2 branches missed.">        if (spanContext.isValid()) {</span>
-<span class="nc" id="L22">            response.setHeader(&quot;X-Trace-Id&quot;, spanContext.getTraceIdAsHexString());</span>
-<span class="nc" id="L23">            response.setHeader(&quot;X-Span-Id&quot;, spanContext.getSpanIdAsHexString());</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        if (spanContext.isValid()) {</span>
+<span class="nc" id="L23">            response.setHeader(&quot;X-Trace-Id&quot;, spanContext.getTraceIdAsHexString());</span>
+<span class="nc" id="L24">            response.setHeader(&quot;X-Span-Id&quot;, spanContext.getSpanIdAsHexString());</span>
         }
-<span class="nc" id="L25">    }</span>
+<span class="nc" id="L26">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

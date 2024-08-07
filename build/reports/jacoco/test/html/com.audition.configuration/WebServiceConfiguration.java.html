@@ -48,7 +48,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 <span class="fc" id="L48">        restTemplate.setMessageConverters(messageConverters);</span>
 
 <span class="fc" id="L50">        restTemplate.getInterceptors().add((request, body, execution) -&gt; {</span>
-<span class="nc" id="L51">            return execution.execute(request, body);</span>
+<span class="fc" id="L51">            return execution.execute(request, body);</span>
         });
 
 <span class="fc" id="L54">        return restTemplate;</span>
