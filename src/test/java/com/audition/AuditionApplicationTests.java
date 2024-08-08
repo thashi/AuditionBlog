@@ -3,6 +3,7 @@ package com.audition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,6 +39,8 @@ class AuditionApplicationTests {
 
     private transient String baseUrl = "https://jsonplaceholder.typicode.com/";
     private transient String postUrl = baseUrl + "posts/";
+    private static final String UNKNOWN_ERROR = "Unknown Error: ";
+    private static final String INTERNAL_ERROR = "Internal Error";
 
     @BeforeEach
     void setUp() {
@@ -74,6 +77,15 @@ class AuditionApplicationTests {
     }
 
     @Test
+    void testGetPostsOtherError() {
+        when(restTemplate.getForObject(baseUrl+"posts", AuditionPost[].class))
+            .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_ERROR));
+
+        final SystemException thrown = assertThrows(SystemException.class, () -> auditionIntegrationClient.getPosts());
+        assertTrue(thrown.getMessage().startsWith(UNKNOWN_ERROR));
+    }
+
+    @Test
     void testGetPostByIdSuccess() {
         final String id = "1";
         final String url = postUrl + id;
@@ -99,6 +111,17 @@ class AuditionApplicationTests {
         });
 
         assertEquals("Cannot find a Post with id 1", exception.getMessage());
+    }
+
+    @Test
+    void testGetPostByIdOtherError() {
+        final String id = "1";
+        final String url = postUrl + id;
+        when(restTemplate.getForObject(url, AuditionPost.class))
+            .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_ERROR));
+
+        final SystemException thrown = assertThrows(SystemException.class, () -> auditionIntegrationClient.getPostById(id));
+        assertTrue(thrown.getMessage().startsWith(UNKNOWN_ERROR));
     }
 
     @Test
@@ -137,6 +160,17 @@ class AuditionApplicationTests {
         assertEquals("Cannot find a Post with id 1", exception.getMessage());
     }
 
+//    @Test
+//    void testGetPostWithCommentsByIdOtherError() {
+//        final String id = "1";
+//        final String url = postUrl + id;
+//        when(restTemplate.getForObject(url, AuditionPost.class))
+//            .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_ERROR));
+//
+//        final SystemException thrown = assertThrows(SystemException.class, () -> auditionIntegrationClient.getPostWithCommentsById(id));
+//        assertTrue(thrown.getMessage().startsWith(UNKNOWN_ERROR));
+//    }
+
     @Test
     void testGetCommentsSuccess() {
         final String postId = "1";
@@ -165,4 +199,14 @@ class AuditionApplicationTests {
         assertEquals("Cannot find any Comments", exception.getMessage());
     }
 
+//    @Test
+//    void testGetCommentOtherError() {
+//        final String postId = "1";
+//        final String url = baseUrl + "comments?postId=" + postId;
+//        when(restTemplate.getForObject(url, Comment[].class))
+//            .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_ERROR));
+//
+//        final SystemException thrown = assertThrows(SystemException.class, () -> auditionIntegrationClient.getComments(postId));
+//        assertTrue(thrown.getMessage().startsWith(UNKNOWN_ERROR));
+//    }
 }

@@ -37,11 +37,11 @@ import org.springframework.web.client.RestTemplate;
 
 <span class="fc" id="L38">            return Arrays.asList(postArray);</span>
 <span class="fc" id="L39">        } catch (final HttpClientErrorException e) {</span>
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
 <span class="fc" id="L41">                throw new SystemException(&quot;Cannot find any Posts&quot;, &quot;Resource Not Fount&quot;, 404, e);</span>
             } else {
-<span class="nc" id="L43">                final String errorMessage = &quot;An error occured while fetching the posts &quot; + e.getMessage();</span>
-<span class="nc" id="L44">                throw new SystemException(unknownError + errorMessage, e);</span>
+<span class="fc" id="L43">                final String errorMessage = &quot;An error occured while fetching the posts &quot; + e.getMessage();</span>
+<span class="fc" id="L44">                throw new SystemException(unknownError + errorMessage, e);</span>
             }
         }
     }
@@ -51,13 +51,13 @@ import org.springframework.web.client.RestTemplate;
         try {
 <span class="fc" id="L52">            return restTemplate.getForObject(url, AuditionPost.class);</span>
 <span class="fc" id="L53">        } catch (final HttpClientErrorException e) {</span>
-<span class="pc bpc" id="L54" title="1 of 2 branches missed.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
 <span class="fc" id="L55">                throw new SystemException(&quot;Cannot find a Post with id &quot; + id, &quot;Resource Not Found&quot;,</span>
 <span class="fc" id="L56">                    404, e);</span>
             } else {
-<span class="nc" id="L58">                final String errorMessage =</span>
-<span class="nc" id="L59">                    &quot;An error occured while fetching the post with id &quot; + id + &quot;: &quot; + e.getMessage();</span>
-<span class="nc" id="L60">                throw new SystemException(unknownError + errorMessage, e);</span>
+<span class="fc" id="L58">                final String errorMessage =</span>
+<span class="fc" id="L59">                    &quot;An error occured while fetching the post with id &quot; + id + &quot;: &quot; + e.getMessage();</span>
+<span class="fc" id="L60">                throw new SystemException(unknownError + errorMessage, e);</span>
             }
         }
     }
